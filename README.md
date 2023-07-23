@@ -2,7 +2,6 @@
 
 ## About
 
-Just a base to start a project using typescript
 
 ## Setup
 To start the project will be necessary run the following scripts:
