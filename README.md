@@ -1,4 +1,4 @@
-# Typescript Base Server
+# Guerrillamail Node
 
 ## About
 
@@ -8,10 +8,10 @@ Just a base to start a project using typescript
 To start the project will be necessary run the following scripts:
 ```bash
 #Clone the repository
-$ git clone https://github.com/ravinmor/typescript_base_server 
+$ git clone https://github.com/ravinmor/guerrillamail_node
 
 #Access the backend app folder
-$ cd typescript_base_server
+$ cd guerrillamail_node
 
 #Install packages
 $ yarn
@@ -23,8 +23,10 @@ $ yarn start
 
 ## Technologies
 <ul>
-  <li>express: 4.17.1</li>
+  <li>axios: 1.4.0</li>
   <li>dotenv: 16.3.1</li>
+  <li>express: 4.18.2</li>
+  <li>ts-jest: 29.1.1</li>
 </ul>
 
 ## Infos
