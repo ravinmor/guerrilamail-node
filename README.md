@@ -10,7 +10,7 @@ To start the project will be necessary run the following scripts:
 #Clone the repository
 $ git clone https://github.com/ravinmor/guerrillamail_node
 
-#Access the backend app folder
+#Access the folder
 $ cd guerrillamail_node
 
 #Install packages

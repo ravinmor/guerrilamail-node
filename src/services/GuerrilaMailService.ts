@@ -2,56 +2,49 @@ import axios from "axios"
 
 interface GuerrilaMailInterface {
     email_addr: string;
-	email_timestamp: string;
+	email_timestamp: number;
 	alias: string;
 	sid_token: string;
 }
 
+interface GuerrillaMailOptionsInterface {
+    ip?: string;
+    agent?: string;
+    lang?: string;
+}
 
 class GuerrilaMailApi {
-    url: string;
-    header: {
-        Accept: string;
-    }
-    obj: {
-        method: string;
-        headers: {
-            Accept: string;
-        }
-    }
+    private url: string;
+    public email_addr: string;
+    public email_user: string;
+    public email_timestamp: number;
+    public alias: string;
+    public sid_token: string;
+    public email_id: string;
+    public alias_error: string;
 
-    email_addr: string;
-    email_user: string;
-    email_timestamp: number;
-    alias: string;
-    sid_token: string;
-    
-    email_id: string;
-
-    alias_error: string;
-    site_id: number;
-    site: string;
-
-    auth: {
-        success: boolean,
-        error_codes: string[]
+    public params: {
+        ip: string;
+        agent: string;
+        lang: string;
     }
 
-    constructor() { 
+    // Always when start this class the email should create his own 
+    // ip, agent, email, email_timestamp, alias and sid_token
+    constructor(private options: GuerrillaMailOptionsInterface = {}) { 
         this.url = `http://api.guerrillamail.com/ajax.php?`;
-        this.header = {
-            Accept: 'application/json'
-        }
-        this.obj = {
-            method: 'GET',
-            headers: this.header,
-        }
 
-        this.get_email_address();
+        this.params = {
+            ip: options.ip || this.randomIp(),
+            agent: options.agent || this.randomAgent(),
+            lang: options.lang || "en"
+        }
+        
     }
 
     async get_email_address(): Promise<GuerrilaMailInterface> {
         const params = {
+            ... this.params,
             f: 'get_email_address'
         };
 
@@ -59,98 +52,79 @@ class GuerrilaMailApi {
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
-        this.email_addr = emailData.email_addr;
-        this.email_user = emailData.email_addr.split('@')[0];
+        this.email_addr      = emailData.email_addr;
+        this.email_user      = emailData.email_addr.split('@')[0];
         this.email_timestamp = emailData.email_timestamp;
-        this.alias = emailData.alias;
-        this.sid_token = emailData.sid_token;
+        this.alias           = emailData.alias;
+        this.sid_token       = emailData.sid_token;
 
         return emailData;
     }
 
-    async set_email_user(email_user = this.email_user): Promise<GuerrilaMailInterface> {
+    async set_email_user(sid_token: string, email_user = this.email_user): Promise<GuerrilaMailInterface> {
         const params = {
+            ... this.params,
             f: 'set_email_user',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
-            lang: 'en',
+            sid_token: sid_token,
             email_user: email_user,
-            sid_token: this.sid_token,
         };
 
         const emailData = await axios.get(this.url, { params })
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
-        // this.alias_error = emailData.alias_error;
-
-        this.alias = emailData.alias;
-
-        this.email_addr = emailData.email_addr;
+        this.alias           = emailData.alias;
+        this.email_addr      = emailData.email_addr;
         this.email_timestamp = emailData.email_timestamp;
-
-        this.site_id = emailData.site_id;
-        this.sid_token = emailData.sid_token;
-
-        this.site = emailData.site;
-
-        // this.auth.success = emailData.auth.success;
-        // this.auth.error_codes = emailData.auth.error_codes;
+        this.sid_token       = emailData.sid_token;
 
         return emailData;
     }
 
-    async check_email(sequency = 1): Promise<GuerrilaMailInterface> {
+    async check_email(sid_token: string, sequency: number = 1): Promise<GuerrilaMailInterface> {
         const params = {
+            ... this.params,
             f: 'check_email',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
             seq: sequency,
-            sid_token: this.sid_token,
+            sid_token: sid_token,
         };
 
         const emailData = await axios.get(this.url, { params })
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
         return emailData;
     }
 
-    async get_email_list(sequency = "", limit = 20): Promise<any> {
+    async get_email_list(sid_token: string, sequency = "", limit = 20): Promise<any> {
         const params = {
+            ... this.params,
             f: 'get_email_list',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
+            sid_token: sid_token,
             seq: sequency,
             offset: limit,
-            sid_token: this.sid_token,
         };
 
         const emailData = await axios.get(this.url, { params })
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
         return emailData;
     }
 
-    async fetch_email(email_id: number): Promise<any>  {
+    async fetch_email(sid_token: string, email_id: number): Promise<any>  {
         const params = {
+            ... this.params,
             f: 'fetch_email',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
-            sid_token: this.sid_token,
+            sid_token: sid_token,
             email_id: email_id
         };
 
@@ -158,56 +132,50 @@ class GuerrilaMailApi {
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
         return emailData;
     }
 
-    async forget_me(): Promise<boolean>  {
+    async forget_me(sid_token: string, email_addr: string): Promise<boolean>  {
         const params = {
+            ... this.params,
             f: 'forget_me',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
-            sid_token: this.sid_token,
-            email_addr: this.email_addr
+            sid_token: sid_token,
+            email_addr: email_addr
         };
 
-        const emailData = await axios.get(this.url, { params })
+        const emailData = await axios.delete(this.url, { params })
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
         return emailData;
     }
 
-    async del_email(email_ids: number[]): Promise<boolean>  {
+    async del_email(sid_token: string, email_ids: number[]): Promise<boolean>  {
         const params = {
+            ... this.params,
             f: 'del_email',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
-            sid_token: this.sid_token,
+            sid_token: sid_token,
             email_ids: email_ids
         };
 
-        const emailData = await axios.get(this.url, { params })
+        const emailData = await axios.delete(this.url, { params })
             .then(result => result.data)
             .catch(err => {
                 throw new Error(err);
-                
             });
 
         return emailData;
     }
 
-    async get_older_list(sequency = "", limit = 20): Promise<boolean>  {
+    async get_older_list(sid_token: string, sequency = "", limit = 20): Promise<boolean>  {
         const params = {
+            ... this.params,
             f: 'get_older_list',
-            ip: '127.0.0.1',
-            agent: 'Mozilla_foo_bar',
-            sid_token: this.sid_token,
+            sid_token: sid_token,
             seq: sequency,
             limit: limit
         };
@@ -215,14 +183,21 @@ class GuerrilaMailApi {
         const emailData = await axios.get(this.url, { params })
             .then(result => result.data)
             .catch(err => {
-                throw new Error(err);
-                
+                throw new Error(err); 
             });
 
         return emailData;
     }
 
     remaining_minutes() {}
+
+    private randomAgent(): string {
+        return "Mozilla_foo_bar"
+    }
+
+    private randomIp(): string {
+        return "127.0.0.1"
+    }
 
 }
 
