@@ -1,0 +1,22 @@
+{
+  "name": "typescript_base_server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "typeorm": "ts-node-dev ./node_modules/typeorm/cli",
+    "start": "ts-node-dev src/server.ts"
+  },
+  "dependencies": {
+    "@types/node": "^20.4.2",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "ts-jest": "^29.1.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  }
+}
